@@ -1,0 +1,142 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema",
+    "type": "object",
+    "definitions": {
+        "library": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the library."
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "description": "The path to the file relative to the library's directory."
+                    }
+                },
+                "provider": {
+                    "type": "string",
+                    "description": "The provider of the library. This is used for remote libraries from a defined provider. Kind is 'Remote'",
+                    "default": "cdnjs",
+                    "enum": [
+                        "cdnjs",
+                        "jsdelivr",
+                        "unpkg",
+                        "npm"
+                    ]
+                },
+                "path": {
+                    "type": "string",
+                    "description": "The source path of the library. This is used for local libraries. Kind is 'Local'"
+                },
+                "url": {
+                    "type": "string",
+                    "description": "The URL to the library. This is used for remote libraries from a custom url. Kind is 'URL'"
+                }
+            },
+            "required": ["name", "files"],
+            "oneOf": [
+                {
+                    "required": [
+                        "provider"
+                    ]
+                },
+                {
+                    "required": [
+                        "url"
+                    ]
+                },
+                {
+                    "required": [
+                        "source"
+                    ]
+                },
+                {
+                    "not": {
+                        "required": [
+                            "provider",
+                            "url",
+                            "source"
+                        ]
+                    },
+                    "properties": {
+                        "provider": {
+                            "const": "cdnjs"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "properties": {
+        "static": {
+            "type": "string",
+            "description": "The static assets directory. Relative paths are resolved against the folder of the config file.",
+            "default": "static"
+        },
+        "output": {
+            "type": "string",
+            "description": "The output directory. Relative to the static folder. Must not resolve to outside the static folder. ",
+            "default": "clientliberator"
+        },
+        "collections": {
+            "type": "object",
+            "patternProperties": {
+                "^[a-zA-Z0-9_]+$": {
+                    "type": "object",
+                    "description": "A collection of libraries. The key is the name of the collection.",
+                    "properties": {
+                        "libraries": {
+                            "type": "array",
+                            "description": "The names of the libraries to include in this collection.",
+                            "items": {
+                                "$ref": "#/definitions/library"
+                            }
+                        },
+                        "extends": {
+                            "type": "array",
+                            "description": "The names of the collections to extend."
+                        }
+                    },
+                    "required": ["files"]
+                }
+            }
+        },
+        "defaultCollection": {
+            "type": "string",
+            "description": "The default collection to use.",
+            "default": "default"
+        },
+        "libraries": {
+            "type": "array",
+            "description": "The libraries to include. The order of the libraries is important, as it is the order they will be included in the frontend. Uses collection name 'single'",
+            "items": {
+                "$ref": "#/definitions/library"
+            }
+        },
+        "tempDirectory": {
+            "type": "string",
+            "description": "The temporary directory for storing intermediate files. Relative parts are resolved against the folder of the config file. If used, $TEMP is replaced with the system's temp directory resolved with python's tempfile.gettempdir(). $RAND is replaced by a random tag for each run",
+            "default": "$TEMP/clientliberator-$RAND"
+        }
+    },
+    "oneOf": [
+        {
+            "required": [
+                "libraries"
+            ],
+            "not": {
+                "required": [
+                    "defaultCollection"
+                ]
+            }
+        },
+        {
+            "required": [
+                "collections"
+            ]
+        }
+    ]
+}

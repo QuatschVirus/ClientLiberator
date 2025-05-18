@@ -10,10 +10,9 @@ authors = [
 ]
 description = "A manager for automatically importing and mapping client libraries with Node in a Flask app"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -21,8 +20,19 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Framework :: Flask",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent"
 ]
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
+dependencies = [
+    "jsonschema ~=4.23.0",
+    "click ==8.1.7",
+    "flask ~=3.1.1",
+    "requests ~=2.32.3",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+clientliberator = "clientliberator.cli:main"
